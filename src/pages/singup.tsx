@@ -28,7 +28,7 @@ const SignUp = () => {
 
         try {
             await createUserWithEmailAndPassword(auth, email, password);
-            router.push('/');
+            await router.push('/');
         } catch (error: any) {
             setError(error.message);
         }

@@ -12,6 +12,7 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import NextLink from 'next/link';
 import {auth} from "../../firebaseConfig";
 
 const theme = createTheme();
@@ -28,7 +29,7 @@ const Login = () => {
 
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            router.push('/');
+            await router.push('/');
         } catch (error: any) {
             setError(error.message);
         }
@@ -109,9 +110,11 @@ const Login = () => {
                                     </Link>
                                 </Grid>
                                 <Grid item>
-                                    <Link href="signup" variant="body2">
-                                        {"Don't have an account? Sign Up"}
-                                    </Link>
+                                    <NextLink href="/signup" passHref>
+                                        <Link variant="body2">
+                                            {"Don't have an account? Sign Up"}
+                                        </Link>
+                                    </NextLink>
                                 </Grid>
                             </Grid>
                         </Box>
