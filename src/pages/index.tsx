@@ -4,7 +4,6 @@ import { Box, Typography, Button, Container, Link as MuiLink } from '@mui/materi
 import { useRouter } from 'next/router';
 import ServiceList from '../components/ServiceList';
 import { collection, getDocs } from 'firebase/firestore';
-import LogoutButton from '../components/LogoutButton';
 import Link from 'next/link';
 import ProtectedRoute from '../components/ProtectedRoute';
 import {useAuth} from "../AuthContext";
@@ -43,47 +42,61 @@ const Home: NextPage = () => {
 
     return (
         <ProtectedRoute>
-            <Container maxWidth="md">
-                <Box
-                    sx={{
-                        minHeight: '100vh',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        bgcolor: 'background.default',
-                        p: 3,
-                        mt: 4
-                    }}
-                >
+            <Box
+                sx={{
+                    backgroundImage: 'url(/background.jpg)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    height: '50vh',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    textAlign: 'center',
+                }}
+            >
+                <Container>
                     <Typography variant="h3" component="h1" gutterBottom>
                         Bem-vindo ao Bicos
                     </Typography>
-                    {loading ? (
-                        <Typography variant="h6">Carregando...</Typography>
-                    ) : user ? (
-                        <>
-                            <Typography variant="h6">Olá, {user.email}</Typography>
-                            <LogoutButton />
-                            <Link href="/services/create" passHref>
-                                <MuiLink variant="button" sx={{ mt: 2, display: 'block' }}>
-                                    Criar Novo Serviço
-                                </MuiLink>
-                            </Link>
-                            {services.length > 0 ? (
-                                <ServiceList services={services} />
-                            ) : (
-                                <Typography variant="body1" sx={{ mt: 2 }}>
-                                    Nenhum serviço disponível no momento.
-                                </Typography>
-                            )}
-                        </>
-                    ) : (
-                        <Button variant="contained" color="primary" onClick={handleLogin}>
-                            Login
+                    <Typography variant="h5" component="p" gutterBottom>
+                        Encontre e contrate os melhores profissionais para os seus serviços
+                    </Typography>
+                    {!user && (
+                        <Button variant="contained" color="primary" onClick={handleLogin} sx={{ backgroundColor: '#2980b9' }}>
+                            Comece Agora
                         </Button>
                     )}
-                </Box>
+                </Container>
+            </Box>
+            <Container maxWidth="md" sx={{ mt: 4 }}>
+                {loading ? (
+                    <Typography variant="h6" align="center">Carregando...</Typography>
+                ) : user ? (
+                    <>
+                        <Box sx={{ textAlign: 'center', mb: 4 }}>
+                            <Typography variant="h6">Olá, {user.email}</Typography>
+                            <Link href="/services/create" passHref>
+                                <MuiLink variant="button" sx={{ mt: 2, display: 'block', textDecoration: 'none' }}>
+                                    <Button variant="contained" color="primary" sx={{ backgroundColor: '#27ae60' }}>
+                                        Criar Novo Serviço
+                                    </Button>
+                                </MuiLink>
+                            </Link>
+                        </Box>
+                        {services.length > 0 ? (
+                            <ServiceList services={services} />
+                        ) : (
+                            <Typography variant="body1" align="center">
+                                Nenhum serviço disponível no momento.
+                            </Typography>
+                        )}
+                    </>
+                ) : (
+                    <Button variant="contained" color="primary" onClick={handleLogin}>
+                        Login
+                    </Button>
+                )}
             </Container>
         </ProtectedRoute>
     );

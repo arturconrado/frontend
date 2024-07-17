@@ -1,28 +1,42 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
+import { useRouter } from 'next/router';
 
-interface AuthContextType {
+interface AuthContextProps {
     user: User | null;
     loading: boolean;
+    logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType>({ user: null, loading: true });
+const AuthContext = createContext<AuthContextProps>({
+    user: null,
+    loading: true,
+    logout: () => {},
+});
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState<boolean>(true);
+    const router = useRouter();
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             setUser(user);
             setLoading(false);
         });
-        return unsubscribe;
+
+        return () => unsubscribe();
     }, []);
 
+    const logout = async () => {
+        await signOut(auth);
+        setUser(null);
+        router.push('/login');
+    };
+
     return (
-        <AuthContext.Provider value={{ user, loading }}>
+        <AuthContext.Provider value={{ user, loading, logout }}>
             {children}
         </AuthContext.Provider>
     );
