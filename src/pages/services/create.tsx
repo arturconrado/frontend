@@ -1,42 +1,68 @@
 import React, { useState } from 'react';
+import { collection, addDoc } from 'firebase/firestore';
+import { useRouter } from 'next/router';
+import { Box, Button, Container, TextField, Typography } from '@mui/material';
+import {db} from "../../../firebaseConfig";
 
-const CreateService = () => {
+const CreateService: React.FC = () => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const router = useRouter();
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Lógica para salvar o serviço no backend
-        console.log({ title, description });
+
+        try {
+            const docRef = await addDoc(collection(db, 'services'), {
+                title,
+                description,
+            });
+            console.log('Document written with ID: ', docRef.id);
+            router.push('/');
+        } catch (e) {
+            console.error('Error adding document: ', e);
+        }
     };
 
     return (
-        <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold">Cadastrar Serviço</h1>
-    <form onSubmit={handleSubmit}>
-        <div>
-            <label>Título</label>
-        <input
-    type="text"
-    value={title}
-    onChange={(e) => setTitle(e.target.value)}
-    required
-    className="border p-2"
-        />
-        </div>
-        <div>
-        <label>Descrição</label>
-        <textarea
-    value={description}
-    onChange={(e) => setDescription(e.target.value)}
-    required
-    className="border p-2"
-        />
-        </div>
-        <button type="submit" className="bg-blue-500 text-white p-2">Cadastrar</button>
-        </form>
-        </div>
-);
+        <Container maxWidth="sm">
+            <Box
+                component="form"
+                onSubmit={handleSubmit}
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    mt: 4
+                }}
+            >
+                <Typography variant="h4" component="h1" gutterBottom>
+                    Criar Novo Serviço
+                </Typography>
+                <TextField
+                    label="Título"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                />
+                <TextField
+                    label="Descrição"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    multiline
+                    rows={4}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                />
+                <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
+                    Criar
+                </Button>
+            </Box>
+        </Container>
+    );
 };
 
 export default CreateService;
