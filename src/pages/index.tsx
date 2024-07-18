@@ -3,11 +3,10 @@ import type { NextPage } from 'next';
 import { Box, Typography, Button, Container, Link as MuiLink } from '@mui/material';
 import { useRouter } from 'next/router';
 import ServiceList from '../components/ServiceList';
-import { collection, getDocs } from 'firebase/firestore';
 import Link from 'next/link';
 import ProtectedRoute from '../components/ProtectedRoute';
-import {useAuth} from "../AuthContext";
-import {db} from "../../firebaseConfig";
+import { useAuth } from "../AuthContext";
+import {getServices} from "../services/serviceService";
 
 interface Service {
     id: string;
@@ -24,13 +23,12 @@ const Home: NextPage = () => {
         if (loading) return;
 
         const fetchServices = async () => {
-            const serviceCollection = collection(db, 'services');
-            const serviceSnapshot = await getDocs(serviceCollection);
-            const serviceList = serviceSnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            })) as Service[];
-            setServices(serviceList);
+            try {
+                const data = await getServices();
+                setServices(data);
+            } catch (error) {
+                console.error('Erro ao buscar serviços:', error);
+            }
         };
 
         fetchServices();

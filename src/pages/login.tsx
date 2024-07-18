@@ -13,7 +13,7 @@ import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import NextLink from 'next/link';
-import {auth} from "../../firebaseConfig";
+import { auth } from '../../firebaseConfig';
 
 const theme = createTheme();
 
@@ -28,7 +28,10 @@ const Login = () => {
         setError('');
 
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const token = await userCredential.user.getIdToken();
+            localStorage.setItem('token', token);
+            console.log('Token armazenado:', token);
             router.push('/');
         } catch (error: any) {
             setError(error.message);
