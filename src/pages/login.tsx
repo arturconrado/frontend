@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/router';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -12,8 +11,7 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import NextLink from 'next/link';
-import { auth } from '../../firebaseConfig';
+import {useAuth} from "../AuthContext";
 
 const theme = createTheme();
 
@@ -21,6 +19,7 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const { login } = useAuth();
     const router = useRouter();
 
     const handleLogin = async (e: React.FormEvent) => {
@@ -28,13 +27,10 @@ const Login = () => {
         setError('');
 
         try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const token = await userCredential.user.getIdToken();
-            localStorage.setItem('token', token);
-            console.log('Token armazenado:', token);
+            await login(email, password);
             router.push('/');
         } catch (error: any) {
-            setError(error.message);
+            setError(error.response?.data?.message || 'An error occurred');
         }
     };
 
@@ -113,11 +109,9 @@ const Login = () => {
                                     </Link>
                                 </Grid>
                                 <Grid item>
-                                    <NextLink href="/signup" passHref>
-                                        <Link variant="body2">
-                                            {"Don't have an account? Sign Up"}
-                                        </Link>
-                                    </NextLink>
+                                    <Link href="/signup" variant="body2">
+                                        {"Don't have an account? Sign Up"}
+                                    </Link>
                                 </Grid>
                             </Grid>
                         </Box>

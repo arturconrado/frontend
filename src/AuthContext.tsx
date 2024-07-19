@@ -1,18 +1,28 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, signOut, User } from 'firebase/auth';
-import { auth } from '../firebaseConfig';
 import { useRouter } from 'next/router';
+import axios from 'axios';
+
+interface User {
+    id: string;
+    email: string;
+    role: string;
+    access_token: string;
+}
 
 interface AuthContextProps {
     user: User | null;
     loading: boolean;
+    login: (email: string, password: string) => Promise<void>;
     logout: () => void;
+    register: (email: string, password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps>({
     user: null,
     loading: true,
+    login: async () => {},
     logout: () => {},
+    register: async () => {},
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -21,22 +31,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const router = useRouter();
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setUser(user);
+        const token = localStorage.getItem('token');
+        if (token) {
+            axios.get(`${process.env.NEXT_PUBLIC_VERIFY_URL}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+                .then(response => {
+                    setUser(response.data);
+                })
+                .catch(() => {
+                    localStorage.removeItem('token');
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        } else {
             setLoading(false);
-        });
-
-        return () => unsubscribe();
+        }
     }, []);
 
+    const login = async (email: string, password: string) => {
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_LOGIN_URL}`, { email, password });
+        localStorage.setItem('token', response.data.access_token);
+        setUser(response.data);
+        await router.push('/');
+    };
+
     const logout = async () => {
-        await signOut(auth);
+        localStorage.removeItem('token');
         setUser(null);
-        router.push('/login');
+        await router.push('/login');
+    };
+
+    const register = async (email: string, password: string) => {
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_REGISTER_URL}`, { email, password });
+        localStorage.setItem('token', response.data.access_token);
+        setUser(response.data);
+        await router.push('/');
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, logout }}>
+        <AuthContext.Provider value={{ user, loading, login, logout, register }}>
             {children}
         </AuthContext.Provider>
     );

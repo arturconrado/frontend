@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/router';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -12,7 +11,7 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import {auth} from "../../firebaseConfig";
+import {useAuth} from "../AuthContext";
 
 const theme = createTheme();
 
@@ -20,6 +19,7 @@ const SignUp = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const { register } = useAuth();
     const router = useRouter();
 
     const handleSignUp = async (e: React.FormEvent) => {
@@ -27,10 +27,9 @@ const SignUp = () => {
         setError('');
 
         try {
-            await createUserWithEmailAndPassword(auth, email, password);
-            router.push('/');
+            await register(email, password);
         } catch (error: any) {
-            setError(error.message);
+            setError(error.response?.data?.message || 'An error occurred');
         }
     };
 
