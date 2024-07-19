@@ -25,7 +25,6 @@ const CreateService: React.FC = () => {
                 title,
                 description,
                 price: parseFloat(price),
-                userId: user.uid,
                 date: new Date(date).toISOString(), // Converte a data para string ISO
             });
             router.push('/');
