@@ -11,13 +11,22 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import {useAuth} from "../AuthContext";
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import { useAuth } from '../AuthContext';
 
 const theme = createTheme();
 
 const SignUp = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
+    const [profession, setProfession] = useState('');
+    const [latitude, setLatitude] = useState('');
+    const [longitude, setLongitude] = useState('');
+    const [role, setRole] = useState('USER');
     const [error, setError] = useState('');
     const { register } = useAuth();
     const router = useRouter();
@@ -27,7 +36,8 @@ const SignUp = () => {
         setError('');
 
         try {
-            await register(email, password);
+            await register(email, password, name, profession, role, latitude, longitude);
+            router.push('/login');
         } catch (error: any) {
             setError(error.response?.data?.message || 'An error occurred');
         }
@@ -92,6 +102,59 @@ const SignUp = () => {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                             />
+                            <TextField
+                                margin="normal"
+                                fullWidth
+                                id="name"
+                                label="Name"
+                                name="name"
+                                autoComplete="name"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                            />
+                            <TextField
+                                margin="normal"
+                                fullWidth
+                                id="profession"
+                                label="Profession"
+                                name="profession"
+                                autoComplete="profession"
+                                value={profession}
+                                onChange={(e) => setProfession(e.target.value)}
+                            />
+                            <TextField
+                                margin="normal"
+                                fullWidth
+                                id="latitude"
+                                label="Latitude"
+                                name="latitude"
+                                autoComplete="latitude"
+                                value={latitude}
+                                onChange={(e) => setLatitude(e.target.value)}
+                            />
+                            <TextField
+                                margin="normal"
+                                fullWidth
+                                id="longitude"
+                                label="Longitude"
+                                name="longitude"
+                                autoComplete="longitude"
+                                value={longitude}
+                                onChange={(e) => setLongitude(e.target.value)}
+                            />
+                            <FormControl fullWidth margin="normal">
+                                <InputLabel id="role-label">Role</InputLabel>
+                                <Select
+                                    labelId="role-label"
+                                    id="role"
+                                    value={role}
+                                    label="Role"
+                                    onChange={(e) => setRole(e.target.value)}
+                                >
+                                    <MenuItem value="USER">User</MenuItem>
+                                    <MenuItem value="PROFESSIONAL">Professional</MenuItem>
+                                </Select>
+                            </FormControl>
                             {error && <Typography color="error">{error}</Typography>}
                             <Button
                                 type="submit"

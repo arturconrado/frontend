@@ -14,7 +14,7 @@ interface AuthContextProps {
     loading: boolean;
     login: (email: string, password: string) => Promise<void>;
     logout: () => void;
-    register: (email: string, password: string) => Promise<void>;
+    register: (email: string, password: string, name: string, profession: string, role: string, latitude?: string, longitude?: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps>({
@@ -63,8 +63,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await router.push('/login');
     };
 
-    const register = async (email: string, password: string) => {
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_REGISTER_URL}`, { email, password });
+    const register = async (email: string, password: string, name: string, profession: string, role: string, latitude?: string, longitude?: string) => {
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_REGISTER_URL}`, { email, password, name, profession, role, latitude, longitude });
         localStorage.setItem('token', response.data.access_token);
         setUser(response.data);
         await router.push('/');
