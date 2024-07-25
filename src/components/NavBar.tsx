@@ -27,9 +27,15 @@ const NavBar: React.FC = () => {
                             <Link href="/profile" passHref>
                                 <Button color="inherit">Perfil</Button>
                             </Link>
+
+                            <Link href="/chat" passHref>
+                                <Button color="inherit">Chat</Button>
+                            </Link>
+
                             <Link href="/dashboard" passHref>
                                 <Button color="inherit">Dashboard</Button>
                             </Link>
+
                             <Button color="inherit" onClick={handleLogout}>
                                 Logout
                             </Button>
